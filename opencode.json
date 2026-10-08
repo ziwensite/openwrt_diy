@@ -1,0 +1,33 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "bash": {
+      "Get-ChildItem *": "allow",
+      "Select-Object *": "allow",
+      "Get-Content *": "allow",
+      "ForEach-Object *": "allow",
+      "Sort-Object *": "allow",
+      "Select-String *": "allow",
+      "Invoke-RestMethod *": "allow",
+      "Write-Output *": "allow",
+      "Where-Object *": "allow",
+      "Get-B64 *": "allow",
+      "Invoke-WebRequest *": "allow",
+      "bash *": "allow",
+      "git --exec-path *": "allow",
+      "Test-Path *": "allow",
+      "\"C:\\Program Files\\Git\\bin\\bash.exe\" *": "allow",
+      "Remove-Item *": "allow",
+      "New-Item *": "allow",
+      "Out-Null *": "allow",
+      "$bash *": "allow"
+    },
+    "webfetch": "allow",
+    "external_directory": {
+      "C:/Users/yl.song/AppData/Local/Temp/opencode/*": "allow"
+    },
+    "edit": {
+      "*": "allow"
+    }
+  }
+}

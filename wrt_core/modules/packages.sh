@@ -126,6 +126,33 @@ sync_sparse_packages_to_feed_dir() {
     fi
 }
 
+# 整仓克隆单个软件包（适用于仓库根目录即软件包的情况，如 syncthing 核心包）
+clone_package_to_feed_dir() {
+    local repo_url="$1"
+    local repo_branch="$2"
+    local target_dir="$3"
+    local repo_label="$4"
+    local pkg="$5"
+
+    echo "正在从 $repo_label 克隆 $pkg 软件包..."
+    rm -rf "$target_dir/$pkg"
+    if [ -n "$repo_branch" ]; then
+        if ! git clone --depth 1 -b "$repo_branch" "$repo_url" "$target_dir/$pkg"; then
+            echo "错误：从 $repo_url 克隆 $pkg 失败" >&2
+            rm -rf "$target_dir/$pkg"
+            return 1
+        fi
+    else
+        if ! git clone --depth 1 "$repo_url" "$target_dir/$pkg"; then
+            echo "错误：从 $repo_url 克隆 $pkg 失败" >&2
+            rm -rf "$target_dir/$pkg"
+            return 1
+        fi
+    fi
+    rm -rf "$target_dir/$pkg/.git"
+    return 0
+}
+
 register_local_feed_source() {
     local custom_feed_dir="$1"
     local feeds_path="$2"
@@ -156,8 +183,8 @@ install_custom_feed() {
         lucky luci-app-lucky luci-app-openclash luci-app-homeproxy luci-app-amlogic \
         oaf open-app-filter luci-app-oaf easytier luci-app-easytier \
         msd_lite luci-app-msd_lite cups luci-app-cupsd \
-        cloudflared luci-app-cloudflared verysync luci-app-verysync \
-        webdav2 unishare luci-app-unishare syncthing luci-app-syncthing
+        verysync luci-app-verysync \
+        webdav2 unishare luci-app-unishare luci-app-syncthing
     )
     local required_feed_dirs=(
         cups tcping v2ray-geodata luci-lib-taskd luci-app-openclash
@@ -183,6 +210,7 @@ install_custom_feed() {
 
     custom_feed_sources=(
         "kenzok8/small-package|https://github.com/kenzok8/small-package.git||${base_custom_feed_packages[*]}"
+        "lmq8267/luci-app-cloudflared|https://github.com/lmq8267/luci-app-cloudflared.git||luci-app-cloudflared"
         "sbwml/luci-app-mosdns|https://github.com/sbwml/luci-app-mosdns.git|v5|mosdns luci-app-mosdns"
         "Openwrt-Passwall/openwrt-passwall|https://github.com/Openwrt-Passwall/openwrt-passwall.git|main|luci-app-passwall"
         "nikkinikki-org/OpenWrt-nikki|https://github.com/nikkinikki-org/OpenWrt-nikki.git|main|nikki luci-app-nikki mihomo-meta"
@@ -208,6 +236,13 @@ install_custom_feed() {
             return 1
         fi
     done
+
+    # 补充：syncthing 核心包已从 kenzok8/small-package 与官方 feeds 移除，
+    # 改用整仓克隆 AutoCONFIG/syncthing（仓库根目录即软件包）
+    if ! clone_package_to_feed_dir "https://github.com/AutoCONFIG/syncthing.git" "" "$custom_feed_dir" "AutoCONFIG/syncthing" "syncthing"; then
+        rm -rf "$custom_feed_dir"
+        return 1
+    fi
 
     register_local_feed_source "$custom_feed_dir" "$feeds_path"
 
