@@ -534,6 +534,11 @@ fix_netfilter_kmod_clash() {
         return 0
     fi
 
+    if ! grep -q 'kmod-iptables' "$netfilter_mk"; then
+        echo "未在 $netfilter_mk 中发现 kmod-iptables 相关定义（如 LibWrt 25.12-nss 已拆分 nf-ipt/nf-ipt6），无需 netfilter kmod clash workaround，跳过"
+        return 0
+    fi
+
     echo "Netfilter kmod clash workaround target not found in $netfilter_mk" >&2
     return 1
 }
