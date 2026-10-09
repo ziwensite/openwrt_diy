@@ -183,6 +183,7 @@ install_custom_feed() {
         lucky luci-app-lucky luci-app-openclash luci-app-homeproxy luci-app-amlogic \
         v2raya luci-app-v2raya \
         microsocks luci-app-ssr-plus \
+        luci-app-filebrowser-go \
         oaf open-app-filter luci-app-oaf easytier luci-app-easytier \
         msd_lite luci-app-msd_lite cups luci-app-cupsd \
         verysync luci-app-verysync \
